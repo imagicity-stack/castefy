@@ -98,6 +98,7 @@ To import once (admin only):
 - `next-pwa` is configured in `next.config.js` with an offline fallback at `/offline`.
 - Manifest + icons live in `public/manifest.json` and `public/icons/*` (SVG, maskable friendly).
 - Install prompt suggestion can be triggered client-side using localStorage heuristics (stub ready).
+- Service worker generation is opt-in. Set `NEXT_PUBLIC_ENABLE_PWA=true` on production builds to emit `sw.js`; when omitted, deployments intentionally skip the service worker so stale caches cannot keep serving old 404s.
 
 ## Core flows implemented
 - Phone OTP auth pages (login + verify) with invisible reCAPTCHA placeholder.
@@ -144,7 +145,7 @@ To import once (admin only):
 ## Deployment (Vercel)
 1. Push code to a Git repo.
 2. In Vercel project settings, add environment variables from `.env.local`.
-3. Set `NODE_ENV=production` to enable PWA service worker.
+3. Set `NODE_ENV=production` and `NEXT_PUBLIC_ENABLE_PWA=true` to enable the service worker (omit the flag to deploy without PWA caching if you're fighting stale assets).
 4. Deploy. After the first production build, verify:
    - `/manifest.json` loads
    - Service worker is registered (Application > Service Workers)
