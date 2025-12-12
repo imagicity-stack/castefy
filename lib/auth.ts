@@ -2,7 +2,7 @@ import type { NextRequest } from 'next/server';
 
 import { adminAuth } from './firebaseAdmin';
 
-export async function verifyIdToken(token: string | undefined) {
+export async function verifyIdToken(token: string | null | undefined) {
   if (!token || !adminAuth) return null;
   try {
     return await adminAuth.verifyIdToken(token);
