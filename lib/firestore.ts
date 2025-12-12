@@ -10,12 +10,13 @@ import {
   limit,
   orderBy
 } from 'firebase/firestore';
-import { db } from './firebaseClient';
+import { getFirestoreDb } from './firebaseClient';
 import { UserProfile, CasteMaster, SubCasteMaster, SwipeAction, Match } from './types';
 
 function requireDb() {
-  if (!db) throw new Error('Firebase client not configured');
-  return db;
+  const database = getFirestoreDb();
+  if (!database) throw new Error('Firebase client not configured');
+  return database;
 }
 
 export async function ensureUserDocument(uid: string, phone: string) {
