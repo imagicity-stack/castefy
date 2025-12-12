@@ -112,6 +112,35 @@ To import once (admin only):
 - Server-side admin SDK optional in `lib/firebaseAdmin.ts` (requires `FIREBASE_SERVICE_ACCOUNT_BASE64`).
 - Auth token is expected in the `castefy_token` cookie for server routes.
 
+## App Router API safety (Vercel-ready)
+- All `/app/api/**/route.ts` files opt into `export const runtime = "nodejs"` and `export const dynamic = "force-dynamic"` to prevent static optimization.
+- No runtime logic executes at the module level—handlers perform all work after receiving a `NextRequest`.
+- Firebase Admin SDK and auth helpers are dynamically imported inside handlers to avoid build-time evaluation.
+- Client-side Firebase SDK must never be referenced inside API routes.
+
+## Firebase Admin do's and don'ts
+- ✅ Initialize Admin only when `FIREBASE_SERVICE_ACCOUNT_BASE64` is present and reuse the first app via `getApps()`.
+- ✅ Normalize multiline private keys with `replace(/\\n/g, "\n")` before initialization.
+- ✅ Access Firestore/Auth through the exported `adminDb` and `adminAuth` helpers.
+- ❌ Do not import Firebase Admin directly in React components or client bundles.
+- ❌ Do not run Firestore queries or token verification at the top level of API route modules.
+
+## Cookie handling in App Router
+- Read cookies from the `NextRequest` passed to handlers or helpers (e.g., `req.cookies.get('castefy_token')`).
+- Avoid using `cookies()` or `headers()` outside of a request context for server routes.
+- Keep auth token parsing synchronous and side-effect free to stay compatible with Edge-free runtimes.
+
+## Vercel build safety
+- Avoid top-level async work, filesystem reads, or environment branching in route modules; keep it inside handlers.
+- Do not reference `window`/`document` or other browser globals in server code.
+- Mark dynamic routes explicitly to prevent “prerender” attempts during `next build`.
+
+## Preventing "Failed to collect page data"
+- Ensure API routes are dynamic and Node.js runtime only (no Edge-only features).
+- Keep Firebase Admin imports inside request handlers so they are skipped during static analysis.
+- Read cookies from `NextRequest` parameters rather than global helpers to avoid serialization errors.
+- Guard missing environment variables (service account) so build/preview deployments stay stable.
+
 ## Deployment (Vercel)
 1. Push code to a Git repo.
 2. In Vercel project settings, add environment variables from `.env.local`.

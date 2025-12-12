@@ -1,20 +1,24 @@
-import { NextRequest } from 'next/server';
-import { adminDb } from '@/lib/firebaseAdmin';
-import { getAuthTokenFromCookie, verifyIdToken } from '@/lib/auth';
 import { promises as fs } from 'fs';
 import path from 'path';
+import type { NextRequest } from 'next/server';
 
-// Force dynamic evaluation so Next.js does not attempt to prerender this route during build
-// (it relies on filesystem reads and admin-only auth checks).
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function POST(req: NextRequest) {
-  const token = getAuthTokenFromCookie();
+  const [{ getAuthTokenFromCookie, verifyIdToken }, { adminDb }] = await Promise.all([
+    import('@/lib/auth'),
+    import('@/lib/firebaseAdmin')
+  ]);
+
+  const token = getAuthTokenFromCookie(req);
   const decoded = await verifyIdToken(token);
+
   if (!decoded || decoded.role !== 'admin') {
     return new Response('Unauthorized', { status: 401 });
   }
+
   if (!adminDb) return new Response('Admin not configured', { status: 500 });
   const db = adminDb;
 
