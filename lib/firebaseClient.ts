@@ -1,8 +1,8 @@
 import { initializeApp, getApps, type FirebaseOptions, type FirebaseApp } from 'firebase/app';
-import { getAuth, RecaptchaVerifier } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
-import { getMessaging, isSupported } from 'firebase/messaging';
+import { getAuth, RecaptchaVerifier, type Auth } from 'firebase/auth';
+import { getFirestore, type Firestore } from 'firebase/firestore';
+import { getStorage, type FirebaseStorage } from 'firebase/storage';
+import { getMessaging, isSupported, type Messaging } from 'firebase/messaging';
 
 const firebaseConfig: FirebaseOptions = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -16,7 +16,12 @@ const firebaseConfig: FirebaseOptions = {
 const missingConfig = Object.values(firebaseConfig).some((v) => !v);
 let app: FirebaseApp | null = null;
 
-export function getFirebaseApp() {
+function isBrowser() {
+  return typeof window !== 'undefined';
+}
+
+export function getFirebaseApp(): FirebaseApp | null {
+  if (!isBrowser()) return null;
   if (app) return app;
   if (missingConfig) {
     console.warn('Firebase env vars missing; client SDK not initialized');
@@ -26,19 +31,31 @@ export function getFirebaseApp() {
   return app;
 }
 
-const appInstance = getFirebaseApp();
-export const auth = appInstance ? getAuth(appInstance) : null;
-export const db = appInstance ? getFirestore(appInstance) : null;
-export const storage = appInstance ? getStorage(appInstance) : null;
+export function getFirebaseAuth(): Auth | null {
+  const appInstance = getFirebaseApp();
+  return appInstance ? getAuth(appInstance) : null;
+}
 
-export const messagingPromise = appInstance
-  ? isSupported().then((supported) => {
-      if (!supported) return null;
-      return getMessaging(appInstance);
-    })
-  : Promise.resolve(null);
+export function getFirestoreDb(): Firestore | null {
+  const appInstance = getFirebaseApp();
+  return appInstance ? getFirestore(appInstance) : null;
+}
+
+export function getFirebaseStorage(): FirebaseStorage | null {
+  const appInstance = getFirebaseApp();
+  return appInstance ? getStorage(appInstance) : null;
+}
+
+export async function getMessagingInstance(): Promise<Messaging | null> {
+  const appInstance = getFirebaseApp();
+  if (!appInstance) return null;
+  const supported = await isSupported();
+  if (!supported) return null;
+  return getMessaging(appInstance);
+}
 
 export function buildRecaptcha(containerId: string) {
-  if (!auth) return null;
+  const auth = getFirebaseAuth();
+  if (!auth || !isBrowser()) return null;
   return new RecaptchaVerifier(auth, containerId, { size: 'invisible' });
 }

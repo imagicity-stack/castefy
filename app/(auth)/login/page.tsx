@@ -6,7 +6,7 @@ import { phoneSchema } from '@/lib/validators';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { PhoneIcon } from '@/app/shared/icons';
-import { buildRecaptcha, auth } from '@/lib/firebaseClient';
+import { buildRecaptcha, getFirebaseAuth } from '@/lib/firebaseClient';
 import { signInWithPhoneNumber } from 'firebase/auth';
 import toast from 'react-hot-toast';
 
@@ -28,6 +28,7 @@ export default function LoginPage() {
     }
     setLoading(true);
     try {
+      const auth = getFirebaseAuth();
       const verifier = buildRecaptcha('recaptcha-container');
       if (!auth || !verifier) {
         toast.error('Firebase not configured');

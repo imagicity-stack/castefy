@@ -1,42 +1,57 @@
-import { NextRequest } from 'next/server';
-import { adminDb } from '@/lib/firebaseAdmin';
-import { getAuthTokenFromCookie, verifyIdToken } from '@/lib/auth';
 import { differenceInYears } from 'date-fns';
+import { NextRequest } from 'next/server';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
-  const token = getAuthTokenFromCookie();
-  const decoded = await verifyIdToken(token);
-  if (!decoded || !adminDb) {
-    return new Response(JSON.stringify({ candidates: demoCandidates() }), { status: 200 });
+  try {
+    const [{ getAuthTokenFromCookie, verifyIdToken }, { adminDb }] = await Promise.all([
+      import('@/lib/auth'),
+      import('@/lib/firebaseAdmin')
+    ]);
+
+    const token = getAuthTokenFromCookie(req);
+    const decoded = await verifyIdToken(token);
+
+    if (!decoded || !adminDb) {
+      return Response.json({ candidates: demoCandidates() });
+    }
+
+    const userSnap = await adminDb.collection('users').doc(decoded.uid).get();
+    const user = userSnap.data();
+
+    if (!user) {
+      return Response.json({ candidates: demoCandidates() });
+    }
+
+    const q = adminDb
+      .collection('users')
+      .where('status', '==', 'active')
+      .where('profile.gender', '==', user.preferences?.genderPref ?? 'Female')
+      .where('profile.casteId', '==', user.profile?.casteId)
+      .orderBy('lastActiveAt', 'desc')
+      .limit(15);
+
+    const snap = await q.get();
+    const candidates = snap.docs
+      .filter((doc) => doc.id !== decoded.uid)
+      .map((doc) => {
+        const profile = doc.data().profile;
+        return {
+          uid: doc.id,
+          name: profile?.firstName ?? 'User',
+          age: profile?.dob ? differenceInYears(new Date(), new Date(profile.dob)) : 25,
+          city: profile?.city ?? 'City',
+          casteLabel: profile?.casteId,
+          photo: profile?.photos?.[0]?.url
+        };
+      });
+
+    return Response.json({ candidates });
+  } catch (error) {
+    return Response.json({ candidates: demoCandidates() });
   }
-
-  const userSnap = await adminDb.collection('users').doc(decoded.uid).get();
-  const user = userSnap.data();
-  if (!user) return new Response(JSON.stringify({ candidates: [] }), { status: 200 });
-
-  const q = adminDb
-    .collection('users')
-    .where('status', '==', 'active')
-    .where('profile.gender', '==', user.preferences?.genderPref ?? 'Female')
-    .where('profile.casteId', '==', user.profile?.casteId)
-    .orderBy('lastActiveAt', 'desc')
-    .limit(15);
-  const snap = await q.get();
-  const candidates = snap.docs
-    .filter((doc) => doc.id !== decoded.uid)
-    .map((doc) => {
-      const profile = doc.data().profile;
-      return {
-        uid: doc.id,
-        name: profile?.firstName ?? 'User',
-        age: profile?.dob ? differenceInYears(new Date(), new Date(profile.dob)) : 25,
-        city: profile?.city ?? 'City',
-        casteLabel: profile?.casteId,
-        photo: profile?.photos?.[0]?.url
-      };
-    });
-
-  return Response.json({ candidates });
 }
 
 function demoCandidates() {

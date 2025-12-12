@@ -8,8 +8,12 @@
         { "fieldPath": "profile.gender", "order": "ASCENDING" },
         { "fieldPath": "profile.casteId", "order": "ASCENDING" },
         { "fieldPath": "lastActiveAt", "order": "DESCENDING" }
-      ]
+      ],
+      "comment": "Supports discovery route filtering by status, profile.gender, profile.casteId with lastActiveAt ordering"
     }
   ],
-  "fieldOverrides": []
+  "fieldOverrides": [],
+  "notes": [
+    "Ensure this composite index exists to keep /api/discovery queries build-safe and production ready."
+  ]
 }

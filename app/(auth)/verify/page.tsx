@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { otpSchema } from '@/lib/validators';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { auth } from '@/lib/firebaseClient';
+import { getFirebaseAuth } from '@/lib/firebaseClient';
 import { signInWithCredential, PhoneAuthProvider } from 'firebase/auth';
 import toast from 'react-hot-toast';
 import { ensureUserDocument } from '@/lib/firestore';
@@ -34,6 +34,7 @@ export default function VerifyPage() {
       router.push('/login');
       return;
     }
+    const auth = getFirebaseAuth();
     if (!auth) {
       toast.error('Firebase not configured');
       return;
