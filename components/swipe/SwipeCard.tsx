@@ -2,7 +2,7 @@
 
 import { useDrag } from '@use-gesture/react';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
-import { useState } from 'react';
+import { useState, type HTMLAttributes } from 'react';
 import { Button } from '@/components/ui/Button';
 import { logSwipe, createMatchIfNeeded } from '@/lib/firestore';
 import { SwipeAction } from '@/lib/types';
@@ -23,15 +23,17 @@ export function SwipeCard({ candidates, currentUid, onNext }: SwipeCardProps) {
   const opacity = useTransform(x, [-200, 0, 200], [0.2, 1, 0.2]);
   const { setShowMatchModal } = useUIStore();
 
-  const bind = useDrag(({ down, movement: [mx], direction: [dx], velocity }) => {
+  const bind = useDrag(({ down, movement: [mx], direction: [dx], velocity: [vx, vy] }) => {
     if (animating) return;
+    const speed = Math.hypot(vx ?? 0, vy ?? 0);
     x.set(mx);
-    if (!down && velocity > 0.2) {
+    if (!down && speed > 0.2) {
       handleSwipe(dx > 0 ? 'like' : 'skip');
     }
   });
 
   const candidate = candidates[index];
+  const gestureBind = bind();
 
   const handleSwipe = async (action: SwipeAction['action']) => {
     if (!candidate) return;
@@ -62,7 +64,7 @@ export function SwipeCard({ candidates, currentUid, onNext }: SwipeCardProps) {
   return (
     <div className="space-y-4">
       <motion.div
-        {...bind()}
+        {...(gestureBind as any)}
         style={{ x, rotate, opacity }}
         className="card-shadow relative h-[420px] rounded-3xl bg-cover bg-center"
         animate={{ scale: animating ? 0.95 : 1 }}

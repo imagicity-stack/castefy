@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { SparklesIcon, ArrowRightIcon } from './shared/icons';
@@ -19,12 +21,12 @@ export default function HomePage() {
         </motion.div>
         <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Link
-            href="/(auth)/login"
+            href="/login"
             className="rounded-full bg-brand-600 px-6 py-3 text-white shadow-lg transition hover:bg-brand-700"
           >
             Start with phone number
           </Link>
-          <Link href="/(auth)/login" className="inline-flex items-center gap-2 text-brand-600">
+          <Link href="/login" className="inline-flex items-center gap-2 text-brand-600">
             See the experience <ArrowRightIcon className="h-4 w-4" />
           </Link>
         </motion.div>

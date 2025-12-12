@@ -29,11 +29,15 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const verifier = buildRecaptcha('recaptcha-container');
+      if (!auth || !verifier) {
+        toast.error('Firebase not configured');
+        return;
+      }
       const confirmation = await signInWithPhoneNumber(auth, parsed.data.phone, verifier);
       sessionStorage.setItem('castefy_verification_id', confirmation.verificationId);
       sessionStorage.setItem('castefy_phone', parsed.data.phone);
       toast.success('OTP sent');
-      router.push('/(auth)/verify');
+      router.push('/verify');
     } catch (err) {
       console.error(err);
       toast.error('Failed to send OTP');

@@ -1,4 +1,4 @@
-import { initializeApp, getApps, type FirebaseOptions } from 'firebase/app';
+import { initializeApp, getApps, type FirebaseOptions, type FirebaseApp } from 'firebase/app';
 import { getAuth, RecaptchaVerifier } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
@@ -13,16 +13,32 @@ const firebaseConfig: FirebaseOptions = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
-const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const storage = getStorage(app);
+const missingConfig = Object.values(firebaseConfig).some((v) => !v);
+let app: FirebaseApp | null = null;
 
-export const messagingPromise = isSupported().then((supported) => {
-  if (!supported) return null;
-  return getMessaging(app);
-});
+export function getFirebaseApp() {
+  if (app) return app;
+  if (missingConfig) {
+    console.warn('Firebase env vars missing; client SDK not initialized');
+    return null;
+  }
+  app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+  return app;
+}
+
+const appInstance = getFirebaseApp();
+export const auth = appInstance ? getAuth(appInstance) : null;
+export const db = appInstance ? getFirestore(appInstance) : null;
+export const storage = appInstance ? getStorage(appInstance) : null;
+
+export const messagingPromise = appInstance
+  ? isSupported().then((supported) => {
+      if (!supported) return null;
+      return getMessaging(appInstance);
+    })
+  : Promise.resolve(null);
 
 export function buildRecaptcha(containerId: string) {
+  if (!auth) return null;
   return new RecaptchaVerifier(auth, containerId, { size: 'invisible' });
 }

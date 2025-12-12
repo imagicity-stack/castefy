@@ -38,7 +38,7 @@ export default function MatchesPage() {
             {matches.map((match) => (
               <Link
                 key={match.id}
-                href={`/(main)/chat/${match.id}`}
+                href={{ pathname: '/(main)/chat/[matchId]', query: { matchId: match.id } }}
                 className="glass card-shadow flex items-center justify-between rounded-2xl p-4"
               >
                 <div>

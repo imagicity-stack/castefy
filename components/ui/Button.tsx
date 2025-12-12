@@ -1,8 +1,8 @@
-import { motion } from 'framer-motion';
+import { motion, type HTMLMotionProps } from 'framer-motion';
 import clsx from 'clsx';
 import React from 'react';
 
-type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+type ButtonProps = HTMLMotionProps<'button'> & {
   variant?: 'primary' | 'ghost' | 'outline';
   loading?: boolean;
 };
