@@ -33,7 +33,7 @@ export default function LoginPage() {
       sessionStorage.setItem('castefy_verification_id', confirmation.verificationId);
       sessionStorage.setItem('castefy_phone', parsed.data.phone);
       toast.success('OTP sent');
-      router.push('/(auth)/verify');
+      router.push('/verify');
     } catch (err) {
       console.error(err);
       toast.error('Failed to send OTP');
