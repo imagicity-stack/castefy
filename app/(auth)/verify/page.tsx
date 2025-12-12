@@ -31,7 +31,11 @@ export default function VerifyPage() {
     const verificationId = sessionStorage.getItem('castefy_verification_id');
     if (!verificationId) {
       toast.error('Start again');
-      router.push('/(auth)/login');
+      router.push('/login');
+      return;
+    }
+    if (!auth) {
+      toast.error('Firebase not configured');
       return;
     }
     setLoading(true);
@@ -40,7 +44,7 @@ export default function VerifyPage() {
       const { user } = await signInWithCredential(auth, credential);
       await ensureUserDocument(user.uid, phone);
       toast.success('Welcome to Castefy');
-      router.push('/(onboarding)/onboarding');
+      router.push('/onboarding');
     } catch (err) {
       console.error(err);
       toast.error('Invalid code');

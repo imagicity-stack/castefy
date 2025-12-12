@@ -13,8 +13,14 @@ import {
 import { db } from './firebaseClient';
 import { UserProfile, CasteMaster, SubCasteMaster, SwipeAction, Match } from './types';
 
+function requireDb() {
+  if (!db) throw new Error('Firebase client not configured');
+  return db;
+}
+
 export async function ensureUserDocument(uid: string, phone: string) {
-  const ref = doc(db, 'users', uid);
+  const database = requireDb();
+  const ref = doc(database, 'users', uid);
   const snap = await getDoc(ref);
   if (!snap.exists()) {
     const payload: UserProfile = {
@@ -30,27 +36,31 @@ export async function ensureUserDocument(uid: string, phone: string) {
 }
 
 export async function fetchActiveCastes() {
-  const q = query(collection(db, 'casteMaster'), where('isActive', '==', true), orderBy('sortOrder'), limit(200));
+  const database = requireDb();
+  const q = query(collection(database, 'casteMaster'), where('isActive', '==', true), orderBy('sortOrder'), limit(200));
   const snap = await getDocs(q);
   return snap.docs.map((d) => d.data() as CasteMaster);
 }
 
 export async function fetchActiveSubCastes(casteId?: string) {
+  const database = requireDb();
   const constraints = [where('isActive', '==', true), orderBy('sortOrder'), limit(400)];
   const filtered = casteId ? [where('casteId', '==', casteId), ...constraints] : constraints;
-  const q = query(collection(db, 'subCasteMaster'), ...filtered);
+  const q = query(collection(database, 'subCasteMaster'), ...filtered);
   const snap = await getDocs(q);
   return snap.docs.map((d) => d.data() as SubCasteMaster);
 }
 
 export async function logSwipe(data: SwipeAction) {
-  const ref = doc(db, 'swipes', `${data.fromUid}_${data.toUid}`);
+  const database = requireDb();
+  const ref = doc(database, 'swipes', `${data.fromUid}_${data.toUid}`);
   await setDoc(ref, { ...data, createdAt: serverTimestamp() }, { merge: true });
 }
 
 export async function createMatchIfNeeded(userA: string, userB: string): Promise<Match | null> {
+  const database = requireDb();
   const id = [userA, userB].sort().join('_');
-  const ref = doc(db, 'matches', id);
+  const ref = doc(database, 'matches', id);
   const snap = await getDoc(ref);
   if (snap.exists()) return snap.data() as Match;
   const match: Match = {
