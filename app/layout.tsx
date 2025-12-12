@@ -6,7 +6,10 @@ import { inter } from './theme';
 export const metadata: Metadata = {
   title: 'Castefy | Intent-first, verified discovery',
   description: 'Swipe with intent. Built for authenticity and community trust.',
-  manifest: '/manifest.json',
+  manifest: '/manifest.json'
+};
+
+export const viewport = {
   themeColor: '#f97316'
 };
 
