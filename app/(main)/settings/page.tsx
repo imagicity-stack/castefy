@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/Button';
 import { useState } from 'react';
+import toast from 'react-hot-toast'; // <--- Add this line
 
 export default function SettingsPage() {
   const [notifications, setNotifications] = useState(true);
