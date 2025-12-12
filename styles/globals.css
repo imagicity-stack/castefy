@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-white text-slate-900 antialiased;
+}
+
+a {
+  @apply text-brand-600 hover:text-brand-700;
+}
+
+.glass {
+  @apply bg-white/80 backdrop-blur-lg border border-white/60 shadow-lg;
+}
+
+.card-shadow {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
