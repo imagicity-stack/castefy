@@ -37,7 +37,9 @@ export default function SettingsPage() {
             </div>
             <input type="checkbox" checked={dailyStack} onChange={() => setDailyStack((v) => !v)} />
           </div>
-          <Button className="w-full">Save</Button>
+          <Button onClick={handleSave} loading={loading} className="w-full">
+  Save
+</Button>
         </div>
       </div>
     </main>
