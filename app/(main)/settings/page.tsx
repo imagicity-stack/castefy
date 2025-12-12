@@ -7,7 +7,17 @@ import toast from 'react-hot-toast'; // <--- Add this line
 export default function SettingsPage() {
   const [notifications, setNotifications] = useState(true);
   const [dailyStack, setDailyStack] = useState(true);
+  const [loading, setLoading] = useState(false); // <--- Add this
 
+  // Add this entire function
+  const handleSave = () => {
+    setLoading(true);
+    // Simulate an API call
+    setTimeout(() => {
+      toast.success('Settings updated!');
+      setLoading(false);
+    }, 800);
+  };
   return (
     <main className="min-h-screen bg-gradient-to-b from-brand-50 to-white px-4 py-6">
       <div className="mx-auto max-w-xl space-y-4">
