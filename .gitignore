@@ -1,0 +1,9 @@
+node_modules
+.next
+out
+.env.local
+.firebase
+*.log
+
+# firebase admin service account files
+serviceAccount.json

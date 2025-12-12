@@ -1,0 +1,11 @@
+[
+  { "id": "iyer", "casteId": "brahmin", "subCasteName": "Iyer", "sortOrder": 1, "isActive": true },
+  { "id": "iyengar", "casteId": "brahmin", "subCasteName": "Iyengar", "sortOrder": 2, "isActive": true },
+  { "id": "gaur", "casteId": "brahmin", "subCasteName": "Gaur", "sortOrder": 3, "isActive": true },
+  { "id": "saraswat", "casteId": "brahmin", "subCasteName": "Saraswat", "sortOrder": 4, "isActive": true },
+  { "id": "parmar", "casteId": "rajput", "subCasteName": "Parmar", "sortOrder": 1, "isActive": true },
+  { "id": "rathore", "casteId": "rajput", "subCasteName": "Rathore", "sortOrder": 2, "isActive": true },
+  { "id": "chauhan", "casteId": "rajput", "subCasteName": "Chauhan", "sortOrder": 3, "isActive": true },
+  { "id": "iyengar_demo", "casteId": "brahmin", "subCasteName": "Smartha", "sortOrder": 5, "isActive": true },
+  { "id": "reddy_kapu", "casteId": "reddy", "subCasteName": "Kapu Reddy", "sortOrder": 1, "isActive": true }
+]
